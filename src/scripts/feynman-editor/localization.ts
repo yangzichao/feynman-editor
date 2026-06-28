@@ -4,14 +4,21 @@ export type FeynmanEditorLocaleCode = 'zh' | 'en';
 
 type Direction = 'ltr';
 
-interface LocaleLink {
-  href: string;
-  label: string;
-}
-
 interface FeynmanEditorMetaText {
   title: string;
   description: string;
+}
+
+interface FeynmanEditorSeoText {
+  keywords: string[];
+  applicationName: string;
+  alternateApplicationName: string;
+  applicationCategory: string;
+  applicationSubCategory: string;
+  browserRequirements: string;
+  featureList: string[];
+  openGraphLocale: string;
+  openGraphAlternateLocales: string[];
 }
 
 interface FeynmanEditorHeroText {
@@ -84,9 +91,9 @@ export interface FeynmanEditorLocale {
   direction: Direction;
   route: string;
   languageName: string;
-  homeLink: LocaleLink;
   languageSwitcherAriaLabel: string;
   meta: FeynmanEditorMetaText;
+  seo: FeynmanEditorSeoText;
   hero: FeynmanEditorHeroText;
   toolbar: FeynmanEditorToolbarText;
   exportPanel: FeynmanEditorExportText;
@@ -101,15 +108,37 @@ export const feynmanEditorLocales: Record<FeynmanEditorLocaleCode, FeynmanEditor
     direction: 'ltr',
     route: '/',
     languageName: '中文',
-    homeLink: {
-      href: 'https://zichaoyang.com/',
-      label: '返回 zichaoyang.com',
-    },
     languageSwitcherAriaLabel: '选择页面语言',
     meta: {
-      title: '费曼图编辑器 - Zichao Yang',
+      title: '在线费曼图编辑器 - axodraw2 LaTeX、SVG、PNG 导出',
       description:
-        '一个受 JaxoDraw 启发的浏览器版费曼图编辑器：绘制传播子、弧线和圈图，并导出 axodraw2 LaTeX、SVG 或 PNG。',
+        '免费的在线费曼图编辑器，支持绘制传播子、弧线、圈图和数学标注，并导出 axodraw2 LaTeX、SVG、PNG 或 JSON。',
+    },
+    seo: {
+      keywords: [
+        '费曼图编辑器',
+        '在线费曼图',
+        '费曼图绘制工具',
+        'Feynman diagram editor',
+        'axodraw2',
+        'JaxoDraw',
+        'LaTeX 费曼图',
+        'SVG 费曼图',
+        '粒子物理图表',
+      ],
+      applicationName: '在线费曼图编辑器',
+      alternateApplicationName: 'Feynman Diagram Editor',
+      applicationCategory: 'EducationalApplication',
+      applicationSubCategory: '粒子物理图表绘制工具',
+      browserRequirements: '需要支持 SVG、Canvas 和现代 JavaScript 的浏览器。',
+      featureList: [
+        '绘制费米子、光子、胶子、标量和鬼粒子传播子',
+        '绘制弧线、圈图、顶点和数学标注',
+        '导出 axodraw2 LaTeX、SVG、PNG 和 JSON',
+        '自动保存到浏览器本地存储',
+      ],
+      openGraphLocale: 'zh_CN',
+      openGraphAlternateLocales: ['en_US'],
     },
     hero: {
       heading: '费曼图编辑器',
@@ -195,15 +224,36 @@ export const feynmanEditorLocales: Record<FeynmanEditorLocaleCode, FeynmanEditor
     direction: 'ltr',
     route: '/en/',
     languageName: 'English',
-    homeLink: {
-      href: 'https://zichaoyang.com/',
-      label: 'Back to zichaoyang.com',
-    },
     languageSwitcherAriaLabel: 'Choose page language',
     meta: {
-      title: 'Feynman Diagram Editor - Zichao Yang',
+      title: 'Feynman Diagram Editor - axodraw2 LaTeX, SVG, PNG Export',
       description:
-        'A browser-based Feynman diagram editor inspired by JaxoDraw: draw propagators, arcs and loops with click-and-drag, export to axodraw2 LaTeX, SVG or PNG.',
+        'Free online Feynman diagram editor for propagators, arcs, loops and math labels, with axodraw2 LaTeX, SVG, PNG and JSON export.',
+    },
+    seo: {
+      keywords: [
+        'Feynman diagram editor',
+        'online Feynman diagram tool',
+        'JaxoDraw alternative',
+        'axodraw2 LaTeX export',
+        'LaTeX Feynman diagrams',
+        'particle physics diagrams',
+        'SVG Feynman diagram export',
+        'PNG Feynman diagram export',
+      ],
+      applicationName: 'Feynman Diagram Editor',
+      alternateApplicationName: 'Online Feynman Diagram Editor',
+      applicationCategory: 'EducationalApplication',
+      applicationSubCategory: 'Particle physics diagram editor',
+      browserRequirements: 'Requires a browser with SVG, Canvas and modern JavaScript support.',
+      featureList: [
+        'Draw fermion, photon, gluon, scalar and ghost propagators',
+        'Create arcs, loops, vertices and math labels',
+        'Export diagrams to axodraw2 LaTeX, SVG, PNG and JSON',
+        'Autosave diagrams to browser local storage',
+      ],
+      openGraphLocale: 'en_US',
+      openGraphAlternateLocales: ['zh_CN'],
     },
     hero: {
       heading: 'Feynman Diagram Editor',

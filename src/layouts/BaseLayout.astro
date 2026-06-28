@@ -5,6 +5,7 @@ import '../styles/effects/depth-3d.css';
 interface Props {
   title?: string;
   description?: string;
+  keywords?: string[];
   lang?: string;
   direction?: 'ltr' | 'rtl';
   canonicalPath?: string;
@@ -12,15 +13,32 @@ interface Props {
     href: string;
     hreflang: string;
   }[];
+  robots?: string;
+  siteName?: string;
+  applicationName?: string;
+  openGraphType?: string;
+  openGraphLocale?: string;
+  openGraphAlternateLocales?: string[];
+  twitterCard?: 'summary' | 'summary_large_image';
+  structuredData?: Record<string, unknown> | Record<string, unknown>[];
 }
 
 const {
   title = 'Zichao Yang',
   description = 'Personal homepage of Zichao Yang — researcher and developer.',
+  keywords = [],
   lang = 'en',
   direction = 'ltr',
   canonicalPath,
   alternateLinks = [],
+  robots = 'index, follow',
+  siteName = 'Feynman Diagram Editor',
+  applicationName = siteName,
+  openGraphType = 'website',
+  openGraphLocale,
+  openGraphAlternateLocales = [],
+  twitterCard = 'summary',
+  structuredData,
 } = Astro.props;
 
 const siteOrigin = Astro.site ?? new URL('https://feynman.zichaoyang.com');
@@ -29,6 +47,14 @@ const resolvedAlternateLinks = alternateLinks.map((alternateLink) => ({
   ...alternateLink,
   href: new URL(alternateLink.href, siteOrigin).toString(),
 }));
+const structuredDataBlocks = Array.isArray(structuredData)
+  ? structuredData
+  : structuredData
+    ? [structuredData]
+    : [];
+const serializedStructuredData = structuredDataBlocks.map((structuredDataBlock) =>
+  JSON.stringify(structuredDataBlock).replace(/</g, '\\u003c')
+);
 ---
 
 <!doctype html>
@@ -37,11 +63,37 @@ const resolvedAlternateLinks = alternateLinks.map((alternateLink) => ({
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
+    <meta name="robots" content={robots} />
+    <meta name="application-name" content={applicationName} />
+    {keywords.length > 0 && <meta name="keywords" content={keywords.join(', ')} />}
     <title>{title}</title>
     {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
     {
       resolvedAlternateLinks.map((alternateLink) => (
         <link rel="alternate" hreflang={alternateLink.hreflang} href={alternateLink.href} />
+      ))
+    }
+    <meta property="og:site_name" content={siteName} />
+    <meta property="og:type" content={openGraphType} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    {canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
+    {openGraphLocale && <meta property="og:locale" content={openGraphLocale} />}
+    {
+      openGraphAlternateLocales.map((alternateLocale) => (
+        <meta property="og:locale:alternate" content={alternateLocale} />
+      ))
+    }
+    <meta name="twitter:card" content={twitterCard} />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    {
+      serializedStructuredData.map((serializedStructuredDataBlock) => (
+        <script
+          type="application/ld+json"
+          is:inline
+          set:html={serializedStructuredDataBlock}
+        ></script>
       ))
     }
 

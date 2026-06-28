@@ -19,6 +19,8 @@ interface Props {
 
 const locale = getFeynmanEditorLocale(Astro.props.localeCode);
 const availableLocales = Object.values(feynmanEditorLocales);
+const siteOrigin = Astro.site ?? new URL('https://feynman.zichaoyang.com');
+const canonicalUrl = new URL(locale.route, siteOrigin).toString();
 const alternateLinks = [
   ...availableLocales.map((availableLocale) => ({
     href: availableLocale.route,
@@ -26,20 +28,55 @@ const alternateLinks = [
   })),
   { href: feynmanEditorLocales.zh.route, hreflang: 'x-default' },
 ];
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  '@id': `${canonicalUrl}#application`,
+  name: locale.seo.applicationName,
+  alternateName: locale.seo.alternateApplicationName,
+  description: locale.meta.description,
+  url: canonicalUrl,
+  inLanguage: locale.htmlLang,
+  applicationCategory: locale.seo.applicationCategory,
+  applicationSubCategory: locale.seo.applicationSubCategory,
+  operatingSystem: 'Any',
+  browserRequirements: locale.seo.browserRequirements,
+  isAccessibleForFree: true,
+  featureList: locale.seo.featureList,
+  potentialAction: {
+    '@type': 'UseAction',
+    target: canonicalUrl,
+  },
+  creator: {
+    '@type': 'Person',
+    name: 'Zichao Yang',
+    url: 'https://zichaoyang.com/',
+  },
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'USD',
+  },
+};
 ---
 
 <BaseLayout
   title={locale.meta.title}
   description={locale.meta.description}
+  keywords={locale.seo.keywords}
   lang={locale.htmlLang}
   direction={locale.direction}
   canonicalPath={locale.route}
   alternateLinks={alternateLinks}
+  siteName={locale.seo.applicationName}
+  applicationName={locale.seo.applicationName}
+  openGraphLocale={locale.seo.openGraphLocale}
+  openGraphAlternateLocales={locale.seo.openGraphAlternateLocales}
+  structuredData={structuredData}
 >
   <article class="feynman-editor-page" data-feynman-editor-locale={locale.code}>
     <header class="feynman-page-header">
       <nav class="feynman-header-nav" aria-label={locale.languageSwitcherAriaLabel}>
-        <a href={locale.homeLink.href} class="feynman-hint">&larr; {locale.homeLink.label}</a>
         <div class="feynman-language-switcher">
           {
             availableLocales.map((availableLocale) => (

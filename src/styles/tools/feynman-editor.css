@@ -7,7 +7,7 @@
 .feynman-header-nav {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 16px;
   margin-bottom: 18px;
 }
@@ -207,8 +207,7 @@
 
 @media (max-width: 768px) {
   .feynman-header-nav {
-    align-items: flex-start;
-    flex-direction: column;
+    justify-content: flex-start;
   }
 
   .feynman-toolbar {
