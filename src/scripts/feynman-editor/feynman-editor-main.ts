@@ -6,6 +6,7 @@ import { downloadDiagramAsJson, openDiagramJsonFile } from './export/json-io';
 import { downloadDiagramAsPng } from './export/png-exporter';
 import { downloadDiagramAsSvg } from './export/svg-exporter';
 import { installKeyboardShortcuts } from './interactions/keyboard-shortcuts';
+import { getFeynmanEditorRuntimeText } from './localization';
 import { PointerController } from './interactions/pointer-controller';
 import { ensureMathJaxLoaded } from './render/label-mathjax';
 import { renderDiagram } from './render/render-diagram';
@@ -15,6 +16,9 @@ export function initFeynmanEditor(): void {
   const canvasWrapper = document.getElementById('feynman-canvas-wrapper');
   const latexOutput = document.getElementById('feynman-latex-output') as HTMLTextAreaElement | null;
   if (!svg || !canvasWrapper || !latexOutput) return;
+
+  const pageElement = document.querySelector<HTMLElement>('[data-feynman-editor-locale]');
+  const runtimeText = getFeynmanEditorRuntimeText(pageElement?.dataset.feynmanEditorLocale);
 
   const state = new EditorState();
   state.restoreFromStorage();
@@ -77,7 +81,7 @@ export function initFeynmanEditor(): void {
   document.getElementById('feynman-undo')?.addEventListener('click', () => state.undo());
   document.getElementById('feynman-redo')?.addEventListener('click', () => state.redo());
   document.getElementById('feynman-clear')?.addEventListener('click', () => {
-    if (window.confirm('Clear the whole diagram?')) state.clearAll();
+    if (window.confirm(runtimeText.clearDiagramConfirmation)) state.clearAll();
   });
 
   // --- Export / import ----------------------------------------------------
@@ -93,16 +97,19 @@ export function initFeynmanEditor(): void {
   document
     .getElementById('feynman-load-json')
     ?.addEventListener('click', () =>
-      openDiagramJsonFile((elements) => state.replaceDocument(elements))
+      openDiagramJsonFile(
+        (elements) => state.replaceDocument(elements),
+        runtimeText.fileReadError
+      )
     );
 
   const copyButton = document.getElementById('feynman-copy-latex');
   copyButton?.addEventListener('click', async () => {
     try {
       await navigator.clipboard.writeText(latexOutput.value);
-      copyButton.textContent = 'Copied!';
+      copyButton.textContent = runtimeText.copiedLabel;
       setTimeout(() => {
-        copyButton.textContent = 'Copy LaTeX';
+        copyButton.textContent = runtimeText.copyLatexLabel;
       }, 1500);
     } catch {
       latexOutput.select();

@@ -5,21 +5,45 @@ import '../styles/effects/depth-3d.css';
 interface Props {
   title?: string;
   description?: string;
+  lang?: string;
+  direction?: 'ltr' | 'rtl';
+  canonicalPath?: string;
+  alternateLinks?: {
+    href: string;
+    hreflang: string;
+  }[];
 }
 
 const {
   title = 'Zichao Yang',
   description = 'Personal homepage of Zichao Yang — researcher and developer.',
+  lang = 'en',
+  direction = 'ltr',
+  canonicalPath,
+  alternateLinks = [],
 } = Astro.props;
+
+const siteOrigin = Astro.site ?? new URL('https://feynman.zichaoyang.com');
+const canonicalUrl = canonicalPath ? new URL(canonicalPath, siteOrigin).toString() : undefined;
+const resolvedAlternateLinks = alternateLinks.map((alternateLink) => ({
+  ...alternateLink,
+  href: new URL(alternateLink.href, siteOrigin).toString(),
+}));
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={lang} dir={direction}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
     <title>{title}</title>
+    {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+    {
+      resolvedAlternateLinks.map((alternateLink) => (
+        <link rel="alternate" hreflang={alternateLink.hreflang} href={alternateLink.href} />
+      ))
+    }
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

@@ -13,7 +13,10 @@ export function downloadDiagramAsJson(elements: DiagramElement[]): void {
 }
 
 /** Open a file picker and parse the chosen diagram JSON. */
-export function openDiagramJsonFile(onLoaded: (elements: DiagramElement[]) => void): void {
+export function openDiagramJsonFile(
+  onLoaded: (elements: DiagramElement[]) => void,
+  fileReadErrorMessage = 'Could not read that file - expected JSON saved by this editor.'
+): void {
   const input = document.createElement('input');
   input.type = 'file';
   input.accept = 'application/json,.json';
@@ -25,7 +28,7 @@ export function openDiagramJsonFile(onLoaded: (elements: DiagramElement[]) => vo
       if (!Array.isArray(parsed.elements)) throw new Error('missing elements array');
       onLoaded(parsed.elements);
     } catch {
-      window.alert('Could not read that file — expected JSON saved by this editor.');
+      window.alert(fileReadErrorMessage);
     }
   });
   input.click();

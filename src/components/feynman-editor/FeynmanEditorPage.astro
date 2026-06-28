@@ -1,0 +1,215 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import '../../styles/tools/feynman-editor.css';
+import {
+  feynmanEditorLocales,
+  getFeynmanEditorLocale,
+  type FeynmanEditorLocaleCode,
+} from '../../scripts/feynman-editor/localization';
+import {
+  CANVAS_HEIGHT,
+  CANVAS_WIDTH,
+  GRID_SIZE,
+  PROPAGATOR_KINDS,
+} from '../../scripts/feynman-editor/diagram-types';
+
+interface Props {
+  localeCode: FeynmanEditorLocaleCode;
+}
+
+const locale = getFeynmanEditorLocale(Astro.props.localeCode);
+const availableLocales = Object.values(feynmanEditorLocales);
+const alternateLinks = [
+  ...availableLocales.map((availableLocale) => ({
+    href: availableLocale.route,
+    hreflang: availableLocale.htmlLang,
+  })),
+  { href: feynmanEditorLocales.zh.route, hreflang: 'x-default' },
+];
+---
+
+<BaseLayout
+  title={locale.meta.title}
+  description={locale.meta.description}
+  lang={locale.htmlLang}
+  direction={locale.direction}
+  canonicalPath={locale.route}
+  alternateLinks={alternateLinks}
+>
+  <article class="feynman-editor-page" data-feynman-editor-locale={locale.code}>
+    <header class="feynman-page-header">
+      <nav class="feynman-header-nav" aria-label={locale.languageSwitcherAriaLabel}>
+        <a href={locale.homeLink.href} class="feynman-hint">&larr; {locale.homeLink.label}</a>
+        <div class="feynman-language-switcher">
+          {
+            availableLocales.map((availableLocale) => (
+              <a
+                href={availableLocale.route}
+                class:list={[
+                  'feynman-language-link',
+                  { 'is-active': availableLocale.code === locale.code },
+                ]}
+                aria-current={availableLocale.code === locale.code ? 'page' : undefined}
+              >
+                {availableLocale.languageName}
+              </a>
+            ))
+          }
+        </div>
+      </nav>
+      <h1>{locale.hero.heading}</h1>
+      <p>
+        {locale.hero.introductionBeforeJaxoDraw}<a href="https://jaxodraw.sourceforge.io/"
+          >JaxoDraw</a
+        >{locale.hero.introductionAfterJaxoDraw}<code>axodraw2</code>{locale.hero
+          .introductionExportSuffix}
+      </p>
+    </header>
+
+    <div class="feynman-toolbar">
+      <div class="feynman-toolbar-group" role="group" aria-label={locale.toolbar.toolGroupAriaLabel}>
+        <button class="feynman-tool-button" data-tool="select">{locale.toolbar.tools.select}</button>
+        <button class="feynman-tool-button" data-tool="fermion"
+          >{locale.toolbar.tools.fermion}</button
+        >
+        <button class="feynman-tool-button" data-tool="photon">{locale.toolbar.tools.photon}</button>
+        <button class="feynman-tool-button" data-tool="gluon">{locale.toolbar.tools.gluon}</button>
+        <button class="feynman-tool-button" data-tool="scalar">{locale.toolbar.tools.scalar}</button>
+        <button class="feynman-tool-button" data-tool="ghost">{locale.toolbar.tools.ghost}</button>
+        <button class="feynman-tool-button" data-tool="loop" title={locale.toolbar.loopTitle}
+          >{locale.toolbar.tools.loop}</button
+        >
+        <button class="feynman-tool-button" data-tool="vertex">{locale.toolbar.tools.vertex}</button>
+        <button class="feynman-tool-button" data-tool="label">{locale.toolbar.tools.label}</button>
+      </div>
+
+      <div
+        class="feynman-toolbar-group"
+        role="group"
+        aria-label={locale.toolbar.actionGroupAriaLabel}
+      >
+        <button class="feynman-tool-button" id="feynman-undo" title={locale.toolbar.undoTitle}
+          >{locale.toolbar.actions.undo}</button
+        >
+        <button class="feynman-tool-button" id="feynman-redo" title={locale.toolbar.redoTitle}
+          >{locale.toolbar.actions.redo}</button
+        >
+        <button class="feynman-tool-button" id="feynman-clear"
+          >{locale.toolbar.actions.clear}</button
+        >
+        <label class="feynman-toolbar-checkbox">
+          <input type="checkbox" id="feynman-snap-toggle" checked />
+          {locale.toolbar.actions.snapToGrid}
+        </label>
+        <label class="feynman-toolbar-checkbox">
+          <input type="checkbox" id="feynman-grid-toggle" checked />
+          {locale.toolbar.actions.grid}
+        </label>
+      </div>
+
+      <div
+        class="feynman-toolbar-group"
+        role="group"
+        aria-label={locale.toolbar.selectedElementAriaLabel}
+        id="feynman-selection-controls"
+        style="display: none"
+      >
+        <select
+          class="feynman-kind-select"
+          id="feynman-kind-select"
+          aria-label={locale.toolbar.lineTypeAriaLabel}
+        >
+          {
+            PROPAGATOR_KINDS.map((propagatorKind) => (
+              <option value={propagatorKind}>{locale.toolbar.kinds[propagatorKind]}</option>
+            ))
+          }
+        </select>
+        <label class="feynman-toolbar-checkbox">
+          <input type="checkbox" id="feynman-arrow-toggle" />
+          {locale.toolbar.actions.arrow}
+        </label>
+        <button
+          class="feynman-tool-button"
+          id="feynman-flip-direction"
+          title={locale.toolbar.flipTitle}
+        >
+          {locale.toolbar.actions.flip}
+        </button>
+        <button
+          class="feynman-tool-button"
+          id="feynman-duplicate"
+          title={locale.toolbar.duplicateTitle}
+        >
+          {locale.toolbar.actions.duplicate}
+        </button>
+        <button class="feynman-tool-button" id="feynman-delete" title={locale.toolbar.deleteTitle}>
+          {locale.toolbar.actions.delete}
+        </button>
+      </div>
+    </div>
+
+    <div id="feynman-canvas-wrapper">
+      <svg
+        id="feynman-canvas"
+        viewBox={`0 0 ${CANVAS_WIDTH} ${CANVAS_HEIGHT}`}
+        preserveAspectRatio="xMidYMid meet"
+      >
+        <defs>
+          <pattern
+            id="feynman-grid"
+            width={GRID_SIZE * 5}
+            height={GRID_SIZE * 5}
+            patternUnits="userSpaceOnUse"
+          >
+            <path
+              d={`M ${GRID_SIZE * 5} 0 L 0 0 0 ${GRID_SIZE * 5}`}
+              fill="none"
+              stroke="#ececec"
+              stroke-width="1"></path>
+          </pattern>
+        </defs>
+      </svg>
+    </div>
+
+    <section class="feynman-export-panel">
+      <h2>{locale.exportPanel.heading}</h2>
+      <textarea
+        id="feynman-latex-output"
+        readonly
+        spellcheck="false"
+        aria-label={locale.exportPanel.latexOutputAriaLabel}></textarea>
+      <div class="feynman-export-actions">
+        <button class="feynman-action-button" id="feynman-copy-latex"
+          >{locale.exportPanel.copyLatex}</button
+        >
+        <button class="feynman-action-button" id="feynman-download-svg"
+          >{locale.exportPanel.downloadSvg}</button
+        >
+        <button class="feynman-action-button" id="feynman-download-png"
+          >{locale.exportPanel.downloadPng}</button
+        >
+        <button class="feynman-action-button" id="feynman-save-json"
+          >{locale.exportPanel.saveJson}</button
+        >
+        <button class="feynman-action-button" id="feynman-load-json"
+          >{locale.exportPanel.loadJson}</button
+        >
+      </div>
+      <p class="feynman-hint">
+        {locale.tips.start} <strong>{locale.tips.selectToolName}</strong>{locale.tips
+          .afterSelect}
+        <strong>{locale.tips.loopToolName}</strong> {locale.tips.afterLoop}
+        <code>$e^-$</code> {locale.tips.mathExampleConnector} <code
+          >$\frac&#123;1&#125;&#123;2&#125;$</code
+        >
+        {locale.tips.afterMathExamples} <code>\Text</code>{locale.tips.afterTextCommand}
+      </p>
+    </section>
+  </article>
+
+  <script>
+    import { initFeynmanEditor } from '../../scripts/feynman-editor/feynman-editor-main';
+    initFeynmanEditor();
+  </script>
+</BaseLayout>

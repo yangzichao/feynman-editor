@@ -1,13 +1,51 @@
-/* Layout and chrome for the Feynman diagram editor at /tools/feynman/. */
+/* Layout and chrome for the Feynman diagram editor. */
 
 .feynman-page-header {
   margin-bottom: 28px;
 }
 
+.feynman-header-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.feynman-language-switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-card-hover);
+}
+
+.feynman-language-link {
+  color: var(--color-text-muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+  padding: 7px 10px;
+  border-radius: 6px;
+  transition: var(--transition);
+}
+
+.feynman-language-link:hover {
+  color: var(--color-text-main);
+  background: #eef0f2;
+}
+
+.feynman-language-link.is-active {
+  color: #ffffff;
+  background: var(--color-accent);
+}
+
 .feynman-page-header h1 {
   font-size: 1.8rem;
   font-weight: 700;
-  letter-spacing: -0.02em;
   margin-bottom: 8px;
 }
 
@@ -168,6 +206,11 @@
 }
 
 @media (max-width: 768px) {
+  .feynman-header-nav {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
   .feynman-toolbar {
     gap: 6px;
   }
